@@ -1,6 +1,6 @@
-# progressive-delivery-lab
+# Progressive-canary-lab
 
-`progressive-delivery-lab` is a local Python demo for one of the most important deployment patterns in large-scale backend systems: ship code first, activate behavior later.
+`progressive-canary-lab` is a local Python demo for one of the most important deployment patterns in large-scale backend systems: ship code first, activate behavior later.
 
 The demo shows how a team can deploy a new app version without scheduled downtime, send a small amount of traffic to it, turn on a feature flag for a controlled audience, watch health metrics, and automatically roll back when the canary becomes unhealthy.
 
@@ -9,13 +9,21 @@ The demo shows how a team can deploy a new app version without scheduled downtim
 ```mermaid
 flowchart LR
     users[Load generator or browser] --> router[Router]
-    router --> stable[app-stable VERSION=v1]
-    router --> canary[app-canary VERSION=v2]
-    canary --> flags[flag-service]
-    stable --> flags
-    controller[rollout-controller] --> router
-    controller --> flags
-    router --> metrics[In-memory metrics]
+    router -->|~90%| stable[app-stable VERSION=v1]
+    router -->|~10%| canary[app-canary VERSION=v2]
+    stable --> flags[flag-service]
+    canary --> flags
+    controller[rollout-controller] -.->|controls| router
+    controller -.->|updates| flags
+    router -->|records| metrics[In-memory metrics]
+
+    style users fill:#EEEDFE,stroke:#534AB7,color:#26215C
+    style router fill:#E1F5EE,stroke:#0F6E56,color:#04342C
+    style stable fill:#E6F1FB,stroke:#185FA5,color:#042C53
+    style canary fill:#FAEEDA,stroke:#854F0B,color:#412402
+    style flags fill:#FAECE7,stroke:#993C1D,color:#4A1B0C
+    style controller fill:#EAF3DE,stroke:#3B6D11,color:#173404
+    style metrics fill:#FBEAF0,stroke:#993556,color:#4B1528
 ```
 
 ## What This Demonstrates
